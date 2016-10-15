@@ -16,13 +16,13 @@ my $number = readline();
 chomp for ($query, $number);
 die "Not a number!\n" unless ($number =~ /^\d+$/);
 die "Max 500 results!\n" unless ($number <= 500);
-my $xml = get("http://kulturarvsdata.se/ksamsok/sru?operation=searchRetrieve&version=1.1&maximumRecords=$number&x-api=test&query=text=$query");
+my $xml = get("http://kulturarvsdata.se/ksamsok/api?method=search&version=1.1&hitsPerPage=$number&x-api=test&query=text=$query");
 die "Failed to fetch results.\n" unless (defined $xml);
 my $xp = XML::XPath->new($xml);
-my $objects = $xp->find('srw:searchRetrieveResponse/srw:records/srw:record/srw:recordData/pres:item');
+my $objects = $xp->find('/result/records/record/rdf:RDF/rdf:Description/ns5:presentation/pres:item');
 my @results;
 for my $node ($objects->get_nodelist()) {
-  my @fields;
+	my @fields;
 	for my $field (qw{organization id type entityUri}) {
 		push @fields, $xp->find("./pres:$field/text()", $node);
 	}
